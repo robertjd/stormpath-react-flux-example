@@ -36,7 +36,7 @@ app.use(require('webpack-dev-middleware')(compiler, {
   publicPath: config.output.publicPath
 }));
 
-app.use('/js', require('webpack-hot-middleware')(compiler));
+app.use(require('webpack-hot-middleware')(compiler));
 
 app.get('/static/jquery.js', function (req, res) {
   res.sendFile(path.join(__dirname, 'dist/js/jquery-2.1.4.min.js'));

@@ -4,22 +4,34 @@ import { Link } from 'react-router';
 import UserStore from '../stores/UserStore';
 
 export default class User extends React.Component {
+  onChangeListener = null;
+
   state = {
     user: {}
   };
 
-  componentDidMount() {
+  constructor() {
+    super();
+  }
+
+  onChange() {
     var self = this;
-
-    var assertState = function () {
-      UserStore.resolveSession(function (err, user) {
+    UserStore.resolveSession(function (err, user) {
+      if (self.onChangeListener !== null) {
         self.setState({ user: user });
-      });
-    }
+      }
+    });
+  }
 
-    UserStore.addChangeListener(assertState);
+  componentDidMount() {
+    this.onChangeListener = this.onChange.bind(this);
+    UserStore.addChangeListener(this.onChangeListener);
+    this.onChange();
+  }
 
-    assertState();
+  componentWillUnmount() {
+    UserStore.removeChangeListener(this.onChangeListener);
+    this.onChangeListener = null;
   }
 
   render() {

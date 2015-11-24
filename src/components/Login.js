@@ -1,7 +1,8 @@
 import React from 'react';
-import UserStore from '../stores/UserStore';
 import ReactMixin from 'react-mixin';
 import { History } from 'react-router';
+
+import UserActions from '../actions/UserActions';
 
 @ReactMixin.decorate(History)
 export default class Login extends React.Component {
@@ -13,12 +14,12 @@ export default class Login extends React.Component {
   }
 
   onFormSubmit(e) {
-    e.preventDefault();
-
     var self = this;
+
+    e.preventDefault();
     self.setState({ isProcessing: true });
 
-    UserStore.authenticate({
+    UserActions.login({
       username: this.state.username,
       password: this.state.password
     }, function (err, result) {
@@ -33,11 +34,11 @@ export default class Login extends React.Component {
   }
 
   onUsernameChanged(e) {
-    this.state.username = e.target.value;
+    this.setState({ username: e.target.value });
   }
 
   onPasswordChanged(e) {
-    this.state.password = e.target.value;
+    this.setState({ password: e.target.value });
   }
 
   render() {

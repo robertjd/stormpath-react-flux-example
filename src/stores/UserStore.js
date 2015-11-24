@@ -1,94 +1,23 @@
 var AppDispatcher = require('../AppDispatcher');
-var UserConstants = require('../constants/UserConstants');
 
-var EventEmitter = require('events').EventEmitter;
+var BaseStore = require('../stores/BaseStore');
+var UserService = require('../services/UserService');
+var UserConstants = require('../constants/UserConstants');
+var UserActions = require('../actions/UserActions');
 
 var _session = false;
 var _sessionError = null;
 var _sessionResolved = false;
 
-function handleJsonResponse(callback) {
-  return function (result) {
-    var data = result.responseJSON || {};
-    if (result.status === 200) {
-      callback(null, data);
-    } else {
-      var message = data.error || 'Invalid request.';
-      callback(new Error(message));
-    }
-  };
-}
+class UserStore extends BaseStore {
+  constructor() {
+    super();
+    this.resolveSession();
+  }
 
-function makeRequest(method, path, data) {
-  $.ajax({
-    type: method,
-    url: path,
-    dataType: 'json',
-    accepts: {
-      text: 'application/json'
-    },
-    success: handleJsonResponse(callback),
-    error: handleJsonResponse(callback)
-  });
-}
-
-function requestCurrentSession(callback) {
-  $.ajax({
-    type: 'GET',
-    url: '/api/session',
-    dataType: 'json',
-    contentType: 'application/json; charset=utf-8',
-    accepts: {
-      text: 'application/json'
-    },
-    success: function (result) {
-      callback(null, result);
-    },
-    error: function (err) {
-      callback(err);
-    }
-  });
-}
-
-function requestAuthenticate(options, callback) {
-  $.ajax({
-    type: 'POST',
-    url: '/api/login',
-    data: JSON.stringify(options),
-    dataType: 'json',
-    contentType: 'application/json; charset=utf-8',
-    success: handleJsonResponse(callback),
-    error: handleJsonResponse(callback)
-  });
-}
-
-function requestRegister(options, callback) {
-  $.ajax({
-    type: 'POST',
-    url: '/api/register',
-    data: JSON.stringify(options),
-    dataType: 'json',
-    contentType: 'application/json; charset=utf-8',
-    success: handleJsonResponse(callback),
-    error: handleJsonResponse(callback)
-  });
-}
-
-function requestLogout(callback) {
-  $.ajax({
-    type: 'GET',
-    url: '/api/logout',
-    dataType: 'json',
-    contentType: 'application/json; charset=utf-8',
-    success: handleJsonResponse(callback),
-    error: handleJsonResponse(callback)
-  });
-}
-
-class UserStore extends EventEmitter {
   isAuthenticated(callback) {
     var assertSession = function () {
-      return _session !== null
+      return _session !== false
     };
 
     if (callback) {
@@ -97,19 +26,19 @@ class UserStore extends EventEmitter {
           return callback(err);
         }
 
-        callback(null, _session !== null);
+        callback(null, assertSession());
       }) 
     } else {
       return assertSession();
     }
   }
 
-  authenticate(options, callback) {
+  login(options, callback) {
     var self = this;
 
     this.reset();
 
-    requestAuthenticate(options, function (err, result) {
+    UserService.login(options, function (err, result) {
       if (err) {
         return callback(err);
       }
@@ -119,18 +48,19 @@ class UserStore extends EventEmitter {
   }
 
   register(options, callback) {
-    requestRegister(options, callback);
+    UserService.register(options, callback);
   }
 
   logout(callback) {
     var self = this;
 
-    requestLogout(function (err) {
+    UserService.logout(function (err) {
       if (err) {
         return callback(err);
       }
 
       self.reset();
+      self.emitChange();
 
       callback();
     });
@@ -143,12 +73,13 @@ class UserStore extends EventEmitter {
       return callback && callback(_sessionError, _session);
     }
 
-    requestCurrentSession(function (err, result) {
+    UserService.me(function (err, result) {
       self.reset(true);
 
       if (err) {
         _sessionError = err;
       } else {
+        _sessionResolved = true;
         _session = result;
       }
 
@@ -167,39 +98,22 @@ class UserStore extends EventEmitter {
     return _session;
   }
 
-  emitChange() {
-    this.emit('change');
-  }
-
-  addChangeListener(callback) {
-    return this.on('change', callback);
-  }
-
-  removeChangeListener(callback) {
-    this.removeListener('change', callback);
-  }
-
   reset(resolved) {
+    _session = false;
     _sessionError = null;
     _sessionResolved = resolved || false;
-
-    for (var key in _session) {
-      delete _session[key];
-    }
-
-    this.emitChange();
   }
 }
 
 var userStore = new UserStore();
-userStore.resolveSession();
 
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
-
-  switch(action.actionType) {
-    case UserConstants.GET_SESSION:
-      getSession();
+  switch(payload.actionType) {
+    case UserConstants.USER_LOGIN:
+      userStore.login(payload.options, payload.callback);
+      break;
+    case UserConstants.USER_LOGOUT:
+      userStore.logout(payload.callback);
       break;
   }
 

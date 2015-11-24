@@ -1,24 +1,36 @@
-import React, { Component } from 'react';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import ReactRouter, { Route } from 'react-router';
-import UserStore from './../stores/UserStore';
 
-export class Authenticated extends Component {
+import UserStore from './../stores/UserStore';
+import UserActions from './../actions/UserActions';
+
+export class Authenticated extends React.Component {
+  onChangeListener = null;
+
   state = {
     authenticated: false
   };
 
-  componentDidMount() {
+  constructor() {
+    super();
+    this.onChangeListener = this.onChange.bind(this);
+  }
+
+  onChange() {
     var self = this;
+    UserStore.isAuthenticated(function (err, authenticated) {
+      self.setState({ authenticated: !!authenticated });
+    });
+  }
 
-    function assertAuthState() {
-      UserStore.isAuthenticated(function (err, authenticated) {
-        self.setState({ authenticated: authenticated });
-      });
-    }
+  componentWillMount() {
+    UserStore.addChangeListener(this.onChangeListener);
+    this.onChange();
+  }
 
-    UserStore.addChangeListener(assertAuthState);
-
-    assertAuthState();
+  componentWillUnmount() {
+    UserStore.removeChangeListener(this.onChangeListener);
   }
 
   render() {  
@@ -39,7 +51,7 @@ export class NotAuthenticated extends Authenticated {
 export class LogoutRoute extends Route {
   static defaultProps = {
     onEnter(nextState, replaceState, callback) {
-      UserStore.logout(function () {
+      UserActions.logout(function () {
         replaceState({ nextPathname: nextState.location.pathname }, '/home');
         callback();
       });
