@@ -105,7 +105,7 @@ Responsible for maintaining the Stormpath session and access to the Stormpath AP
 ## TODO
 
 - [x] Fix mount issue with Authenticated/NotAuthenticated components.
-- [ ] Fix issue with too many session requests.
+- [x] Fix issue with too many session requests.
 - [ ] Fix issue with dispatching Flux session action.
 - [ ] Change hard-coded values in Stormpath components so that they are configurable.
 - [ ] Add reset password component and data store.
