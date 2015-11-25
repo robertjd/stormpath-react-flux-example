@@ -1,37 +1,63 @@
 import React from 'react';
+import ReactMixin from 'react-mixin';
+import { History } from 'react-router';
 
+import UserActions from '../actions/UserActions';
+
+@ReactMixin.decorate(History)
 export default class Register extends React.Component {
   state = {
-    email: '',
-    username: '',
-    password: '',
+    fields: {
+      email: '',
+      username: '',
+      password: '',
+    },
+    isProcessing: false,
     errorMessage: ''
   }
 
-  onFormSubmit() {
+  onFormSubmit(e) {
     e.preventDefault();
 
-    var setState = this.setState.bind(this);
+    var self = this;
+    var redirectTo = this.props.redirectTo || '/';
 
-    UserStore.register(this.state, function (err, result) {
+    self.setState({ isProcessing: true });
+
+    UserActions.register(this.state.fields, function (err, result) {
       if (err) {
-        setState({ errorMessage: err.message });
+        self.setState({
+          errorMessage: err.message,
+          isProcessing: false
+        });
       } else {
-        console.log("Registration succeeded!", result);
+        UserActions.login({
+          username: self.state.fields.email || self.state.fields.username,
+          password: self.state.fields.password
+        }, function (err) {
+          if (err) {
+            self.setState({
+              errorMessage: err.message,
+              isProcessing: false
+            });
+          } else {
+            self.history.pushState(null, redirectTo);
+          }
+        })
       }
     });
   }
 
   onEmailChanged(e) {
-    this.state.email = e.target.value;
+    this.state.fields.email = e.target.value;
   }
 
   onUsernameChanged(e) {
-    this.state.username = e.target.value;
+    this.state.fields.username = e.target.value;
   }
 
   onPasswordChanged(e) {
-    this.state.password = e.target.value;
+    this.state.fields.password = e.target.value;
   }
 
   render() {
@@ -50,6 +76,9 @@ export default class Register extends React.Component {
             <label htmlFor='password'>Password</label>
             <input id='password' name='username' type='password' onChange={this.onPasswordChanged.bind(this)} />
           </p>
+          { this.state.errorMessage === null ?
+            null : <p>{this.state.errorMessage}</p>
+          }
           <p>
             <input type='submit' value='Register' />
           </p>

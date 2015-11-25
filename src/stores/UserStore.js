@@ -20,17 +20,9 @@ class UserStore extends BaseStore {
   }
 
   isAuthenticated(callback) {
-    if (callback) {
-      this.resolveSession(function (err, result) {
-        if (err) {
-          return callback(err);
-        }
-
-        callback(null, _session !== false);
-      }) 
-    } else {
-      return _session !== false;
-    }
+    this.resolveSession(function (err, result) {
+      callback(err, !err && _session !== false);
+    });
   }
 
   login(options, callback) {
@@ -108,6 +100,9 @@ AppDispatcher.register(function (payload) {
       break;
     case UserConstants.USER_LOGOUT:
       userStore.logout(payload.callback);
+      break;
+    case UserConstants.USER_REGISTER:
+      userStore.register(payload.options, payload.callback);
       break;
   }
 

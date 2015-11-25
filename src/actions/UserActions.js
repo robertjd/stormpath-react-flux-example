@@ -2,16 +2,17 @@ import { dispatch } from '../AppDispatcher';
 import UserConstants from '../constants/UserConstants';
 
 class UserActions {
-  getSession(action) {
-    dispatch({
-      actionType: UserConstants.GET_SESSION,
-      action: action
-    });
-  }
-
   login(options, callback) {
     dispatch({
       actionType: UserConstants.USER_LOGIN,
+      options: options,
+      callback: callback
+    });
+  }
+
+  register(options, callback) {
+    dispatch({
+      actionType: UserConstants.USER_REGISTER,
       options: options,
       callback: callback
     });

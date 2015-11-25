@@ -14,10 +14,11 @@ export default class Login extends React.Component {
   }
 
   onFormSubmit(e) {
+    e.preventDefault();
+
     var self = this;
     var redirectTo = this.props.redirectTo || '/';
 
-    e.preventDefault();
     self.setState({ isProcessing: true });
 
     UserActions.login({
