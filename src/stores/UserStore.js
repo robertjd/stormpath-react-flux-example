@@ -15,21 +15,21 @@ class UserStore extends BaseStore {
     this.resolveSession();
   }
 
-  isAuthenticated(callback) {
-    var assertSession = function () {
-      return _session !== false
-    };
+  getSession() {
+    return _session;
+  }
 
+  isAuthenticated(callback) {
     if (callback) {
       this.resolveSession(function (err, result) {
         if (err) {
           return callback(err);
         }
 
-        callback(null, assertSession());
+        callback(null, _session !== false);
       }) 
     } else {
-      return assertSession();
+      return _session !== false;
     }
   }
 
@@ -74,12 +74,13 @@ class UserStore extends BaseStore {
     }
 
     UserService.me(function (err, result) {
-      self.reset(true);
+      self.reset();
+
+      _sessionResolved = true;
 
       if (err) {
         _sessionError = err;
       } else {
-        _sessionResolved = true;
         _session = result;
       }
 
@@ -91,17 +92,10 @@ class UserStore extends BaseStore {
     });
   }
 
-  getSession() {
-    if (!_sessionResolved) {
-      this.resolveSession();
-    }
-    return _session;
-  }
-
   reset(resolved) {
     _session = false;
     _sessionError = null;
-    _sessionResolved = resolved || false;
+    _sessionResolved = false;
   }
 }
 

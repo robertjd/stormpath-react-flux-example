@@ -51,8 +51,9 @@ export class NotAuthenticated extends Authenticated {
 export class LogoutRoute extends Route {
   static defaultProps = {
     onEnter(nextState, replaceState, callback) {
+      var redirectTo = this.redirectTo || '/';
       UserActions.logout(function () {
-        replaceState({ nextPathname: nextState.location.pathname }, '/home');
+        replaceState({ nextPathname: nextState.location.pathname }, redirectTo);
         callback();
       });
     }
@@ -62,9 +63,10 @@ export class LogoutRoute extends Route {
 export class AuthenticatedRoute extends Route {
   static defaultProps = {
     onEnter(nextState, replaceState, callback) {
+      var redirectTo = this.redirectTo || '/';
       UserStore.isAuthenticated(function (err, authenticated) {
         if (err || !authenticated) {
-          replaceState({ nextPathname: nextState.location.pathname }, '/home'); 
+          replaceState({ nextPathname: nextState.location.pathname }, redirectTo); 
         }
         callback();
       });

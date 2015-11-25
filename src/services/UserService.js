@@ -33,6 +33,7 @@ class UserService {
       },
       complete: function (result) {
         var data = result.responseJSON || {};
+        
         if (result.status === 200) {
           callback(null, data);
         } else {

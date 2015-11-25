@@ -9,15 +9,7 @@ export default class HomePage extends React.Component {
   render() {
     return (
       <DocumentTitle title={`Home!`}>
-        <div>
-          <Authenticated>
-            <User />
-          </Authenticated>
-          <NotAuthenticated>
-            <h3>Login</h3>
-            <Login />
-          </NotAuthenticated>
-        </div>
+        <User />
       </DocumentTitle>
     );
   }

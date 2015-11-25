@@ -15,6 +15,7 @@ export default class Login extends React.Component {
 
   onFormSubmit(e) {
     var self = this;
+    var redirectTo = this.props.redirectTo || '/';
 
     e.preventDefault();
     self.setState({ isProcessing: true });
@@ -28,7 +29,7 @@ export default class Login extends React.Component {
       if (err) {
         self.setState({ errorMessage: err.message });
       } else {
-        self.history.pushState(null, '/home');
+        self.history.pushState(null, redirectTo);
       }
     });
   }

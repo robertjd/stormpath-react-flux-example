@@ -106,9 +106,11 @@ Responsible for maintaining the Stormpath session and access to the Stormpath AP
 
 - [x] Fix mount issue with Authenticated/NotAuthenticated components.
 - [x] Fix issue with too many session requests.
-- [ ] Fix issue with dispatching Flux session action.
+- [/] Fix issue with dispatching Flux session action.
 - [ ] Change hard-coded values in Stormpath components so that they are configurable.
 - [ ] Add reset password component and data store.
 - [ ] Add verify email component and data store.
 - [ ] Add ability to tag a route as a LoginRoute, so that it is automatically picked up when you're not authenticated and trying to access a AuthenticatedRoute.
 - [x] Refactor UserStore so that session and user API methods are separate.
+- [ ] Home page should have a link to login, and a link to register.
+- [ ] Add styling to pages.
