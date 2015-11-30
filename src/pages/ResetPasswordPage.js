@@ -1,9 +1,9 @@
 import React from 'react';
 import DocumentTitle from 'react-document-title';
 
-import LoginForm from '../components/LoginForm';
+import ResetPasswordForm from '../components/ResetPasswordForm';
 
-export default class LoginPage extends React.Component {
+export default class ResetPasswordPage extends React.Component {
   render() {
     var redirectTo = this.props.route.redirectTo || '/';
     return (
@@ -11,11 +11,11 @@ export default class LoginPage extends React.Component {
         <div className="container">
           <div className="row">
             <div className="col-xs-12">
-              <h3>Login</h3>
+              <h3>Forgot Password</h3>
               <hr />
             </div>
           </div>
-          <LoginForm redirectTo={redirectTo} />
+          <ResetPasswordForm redirectTo={redirectTo} />
         </div>
       </DocumentTitle>
     );

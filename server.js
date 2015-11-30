@@ -12,7 +12,7 @@ stormpath.init(app, {
   web: {
     me: {
       enabled: true,
-      uri: "/api/session"
+      uri: "/api/me"
     },
     register: {
       enabled: true,
@@ -25,6 +25,10 @@ stormpath.init(app, {
     logout: {
       enabled: true,
       uri: "/api/logout"
+    },
+    forgotPassword: {
+      enabled: true,
+      uri: "/api/forgot"
     }
   }
 });
@@ -38,12 +42,20 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
-app.get('/static/jquery.js', function (req, res) {
-  res.sendFile(path.join(__dirname, 'dist/js/jquery-2.1.4.min.js'));
+app.get('/js/jquery.js', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build/js/jquery-2.1.4.min.js'));
+});
+
+app.get('/css/style.css', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build/css/style.css'));
+});
+
+app.get('/css/bootstrap.min.css', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build/css/bootstrap.min.css'));
 });
 
 app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'dist/index.html'));
+  res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
 app.on('stormpath.ready', function () {

@@ -54,7 +54,7 @@ class UserService {
 	me(callback) {
     var self = this;
     this.meRequestPool.request(function (resultCallback) {
-      self._makeRequest('get', '/api/session', null, resultCallback);
+      self._makeRequest('get', '/api/me', null, resultCallback);
     }, callback);
 	}
 
