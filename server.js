@@ -8,6 +8,13 @@ var config = require('./webpack.config');
 var app = express();
 var compiler = webpack(config);
 
+app.use('/', express.static(path.join(__dirname, 'build')));
+
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath
+}));
+
 stormpath.init(app, {
   web: {
     me: {
@@ -35,26 +42,9 @@ stormpath.init(app, {
 
 app.use(morgan('combined'));
 
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: true,
-  publicPath: config.output.publicPath
-}));
-
 app.use(require('webpack-hot-middleware')(compiler));
 
-app.get('/js/jquery.js', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build/js/jquery-2.1.4.min.js'));
-});
-
-app.get('/css/style.css', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build/css/style.css'));
-});
-
-app.get('/css/bootstrap.min.css', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build/css/bootstrap.min.css'));
-});
-
-app.get('*', function (req, res) {
+app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
